@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>To-Do lists</title>
+    </head>
+    <body>
+        <h1>Your To-Do list</h1>
+        <form>
+            <input name="item_text" id="id_new_item" placeholder="작업 아이템 출력">
+            {% csrf_token %}
+        </form>
+        <!-- input 버튼에서 name은 그룹핑을 위해서 쓰이기도 하다 -->
+        <!-- csrf_token은 각 폼이 생성하는 POST 요청을 확인 할수 있는 토큰 생성 -->
+        <!-- name 속성은 form 제어에 필요하다. 예를들어 form 제출에 있어서 POST나 GET을 쓸 때-->
+        <!-- id 속성은 CSS, JS 작업을 할 때 필요하다 -->
+        <table id="id_list_table">
+            <h1>Registered itmes</h1>
+            <p>dddd</p>
+            <o>dsadasd</o>
+        </table>
+    </body>
+</html>

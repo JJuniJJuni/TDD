@@ -49,4 +49,21 @@ class HomePageTest(TestCase):
         # 그저 home_page 함수가 옳바른 html 파일을 가리키고 있는지만 확인 한다는 것!!
         # 대신 값이 변할 때마다 다르게 출력하는 동적 html 파일은 테스트 해줘야 한다!!
 
+    def test_home_page_can_save_a_POST_request(self):
+        request = HttpRequest()
+        request.method = 'POST'  # 메소드 형태가 'POST' 형인지 확인
+        request.POST['item_text'] = '신규 작업 아이템'
+        # 지금 사용자가 '신규 작업 아이템'이라고 입력하고 서버에 보낸 거임
+
+        response = home_page(request)
+        # 지금 home_page가 이제 request를 받아서 처리를 해주어야 한다.
+        # 만일 안되있으면 home_page에 구현을 해줘야 한다는 것!!
+
+        self.assertIn('신규 작업 아이템', response.content.decode())
+        # 사용자가 입력했을 시 이것이 실제 반영 되있는지 확인
+
+
+
+
+
 
