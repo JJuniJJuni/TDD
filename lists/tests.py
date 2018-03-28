@@ -1,3 +1,4 @@
+from django.template.loader import render_to_string
 from django.core.urlresolvers import resolve
 from django.test import TestCase
 from django.http import HttpRequest
@@ -23,10 +24,29 @@ class HomePageTest(TestCase):
         # 반환되는 것은 HttpResponse라는 클래스의 인스턴트 이다.
         # 즉, 사용자에게 보내주는 출력 값이라는 이야기!! (template 호출이 안되는 것!!)
 
+        """
         self.assertTrue(response.content.startswith(b'<html>'))
         # response의 내용(content)이 '<html>'로 시작하는지 확인
         # responese.content는 byte 형이므로 문자열을 바이트로 변환해서 비교!!
         self.assertIn(b'<title>To-Do lists</title>', response.content)
-        self.assertTrue(response.content.endswith(b'</html>'))
+        self.assertTrue(response.content.strip().endswith(b'</html>'))
         # endswith은 해당 문자열로 끝나는지 확인하는 것!! (정규식 '문자열$'과 비슷)
+        # html 파일 마지막에 Enter 누르고 공백 추가하면 에러 발생한다
+        # 그러면 content.strip() 해서 공백 제거해줘야 됨
+        """
+
+        expected_html = render_to_string("home.html")
+        # html 파일을 가져오는 것은 render() 함수와 비슷하다.
+        # 해당 html 파일을 문자열 형태 객체로 반환!!
+
+        self.assertEqual(response.content.decode(), expected_html)
+
+        # refactoring 과정
+        # html content를 바이트로 비교하지 말고 'render_to_string'을 이용하면
+        # html 파일을 문자열 그대로 비교 가능하다.
+        # 반환되는 Httpresponse 파일을 decode()로 문자열로 변환
+        # 위 코드는 home.html이 정적 파일이기 때문에 상세 사항은 검사 하지 않는다.
+        # 그저 home_page 함수가 옳바른 html 파일을 가리키고 있는지만 확인 한다는 것!!
+        # 대신 값이 변할 때마다 다르게 출력하는 동적 html 파일은 테스트 해줘야 한다!!
+
 
