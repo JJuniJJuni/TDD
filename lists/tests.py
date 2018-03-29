@@ -60,7 +60,21 @@ class HomePageTest(TestCase):
         # 만일 안되있으면 home_page에 구현을 해줘야 한다는 것!!
 
         self.assertIn('신규 작업 아이템', response.content.decode())
-        # 사용자가 입력했을 시 이것이 실제 반영 되있는지 확인
+        # 사용자가 입력했고 반응을 제대로 받는지 확인
+
+        expected_html = render_to_string(
+            'home.html',
+            {'new_item_text': '신규 작업 아이템'}
+        )
+
+        # render_to_string으로 html 파일 문자열로 가져오는데, dictionary 형태로
+        # 두번 째 인자 context로 들어감. 키 값에 해당하는 값에다가 넣어줄 수 있음
+        # 위에 보면 헷갈리면 안된다. response는 HttpResponse 객체이므로
+        # 이게 html 파일인지 모른다. 구현하는 입장이므로 아는거지, 이게 맞는지를
+        # 위에서 확인 한 것!!
+
+        self.assertEqual(response.content.decode(), expected_html)
+
 
 
 
