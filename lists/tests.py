@@ -3,6 +3,7 @@ from django.core.urlresolvers import resolve
 from django.test import TestCase
 from django.http import HttpRequest
 from lists.views import home_page
+from lists.models import Item
 
 # Create your tests here.
 
@@ -76,8 +77,24 @@ class HomePageTest(TestCase):
         self.assertEqual(response.content.decode(), expected_html)
 
 
+class ItemModelTest(TestCase):
+    def test_saving_and_retrieving_items(self):
+        first_item = Item()
+        first_item.text = '첫 번째 아이템'
+        first_item.save()
 
+        second_item = Item()
+        second_item.text = '두 번째 아이템'
+        second_item.save()
 
+        saved_items = Item.objects.all()
+        # Django는 디폴트로 모든 모델 클래스에 대해 'objects'라는 Manager 객체를
+        # 자동으로 추가한다. 이 Manager 객체를 통해 특정 데티러를 필터링 하고 정렬 하는 등
+        # 여러 기능들을 사용 가능하다.
 
+        self.assertEqual(saved_items.count(), 2)
 
-
+        first_saved_item = saved_items[0]
+        second_saved_item = saved_items[1]
+        self.assertEqual(first_saved_item, '첫 번째 아이템')
+        self.assertEqual(second_saved_item, '두 번째 아이템')
