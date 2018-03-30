@@ -86,7 +86,7 @@ class HomePageTest(TestCase):
         # 어떤 상태인지를 나타내준 것!!
         # 302는 redirection 완료라는 것이다.
 
-        self.assertEqual(response['location'], '/')
+        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
         # home_page 처리를 거치고, 현재 위치가 루트 주소인지 확인!!
         # 즉, redirect가 옳바르게 됐냐 이거지!!
 

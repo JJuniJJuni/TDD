@@ -35,7 +35,7 @@ def home_page(request):
         Item.objects.create(text=request.POST['item_text'])
         # Item()로 인스턴트를 안 만들고, create() method를 쓰면
         # 데이터베이스에 저장 가능(간소화 가능)
-        return redirect('/')
+        return redirect('/lists/the-only-list-in-the-world/')
         # 원래 페이지로 해당 매개변수(루트 url)로 다시 views 함수 호출
     '''
     else:
