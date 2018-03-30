@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from lists.models import Item
 from django.shortcuts import render
 
 # Create your views here.
@@ -16,8 +17,14 @@ def home_page(request):
         # 단순히 render(request, 'home.html') 해버리면, 홈페이지 자체를 출력시키는 것!!
         # 입력 처리를 해주어야 함!!
     """
+    item = Item()
+    item.text = request.POST.get('item_text', '')
+    # 사용자로부터 Item input requect를 POST method로 받는다.
+    item.save()
+    # 전달 받은 Item을 데이터베이스에 저장
+
     return render(request, 'home.html', {
-        'new_item_text': request.POST.get('item_text', ''),
+        'new_item_text': item.text
     })
     # [1]
     # refactoring 과정!!
@@ -30,4 +37,7 @@ def home_page(request):
     # 없을 시에 빈 공백으로 에러 방지!!
     # request.POST를 하면 사전 형태로 리턴이 된다.
     # request에서 POST.get을 하고 입력 받은 것을 context로 넘긴다는 거지!!
+
+    # [3]
+    # 이미 위에서 POST.get 처리를 해줬으므로, 굳이 render에서 해줄 필요가 없다.
 

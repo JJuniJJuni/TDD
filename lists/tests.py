@@ -64,8 +64,9 @@ class HomePageTest(TestCase):
         # 사용자가 POST 요청으로 Item 입력 했는지 확인
         # 위에서 1개 넣었으니 개수 확인
 
-        new_item = Item.objects.first(
+        new_item = Item.objects.first()
         # 1개 넣었으므로, 첫번 째 아이템 갖고오고
+        # Item.objects.all()[0]과 같이 쓸 수 있음
 
         self.assertEqual(new_item.text, '신규 작업 아이템')
         # 옳바르게 text를 넣어 요청을 할 수 있는지 확인
