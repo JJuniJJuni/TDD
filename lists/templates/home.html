@@ -14,11 +14,7 @@
         <!-- id 속성은 CSS, JS 작업을 할 때 필요하다 -->
         <table id="id_list_table">
             {% for item in items %}
-                <tr>
-                    <td>
-                        {{ item.text }}
-                    </td>
-                </tr>
+                <tr><td>{{ forloop.counter }}.{{ item.text }}</td></tr>
             {% endfor %}
         </table>
     </body>

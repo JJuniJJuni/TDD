@@ -47,7 +47,10 @@ def home_page(request):
     # POST 입력 요청 처리를 했을 때만 데이터베이스 저장을 해주도록 처리
     # POST 한 뒤에는 항상 redirect를 해주어야 한다는 것을 명시!!
 
-    return render(request, 'home.html')
+    items = Item.objects.all()
+    return render(request, 'home.html',{
+        'items': items
+    })
     # [1]
     # refactoring 과정!!
     # HttpResponse 객체를 render을 이용해 반환한다.
