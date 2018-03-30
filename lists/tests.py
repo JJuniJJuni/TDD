@@ -51,14 +51,24 @@ class HomePageTest(TestCase):
         # 대신 값이 변할 때마다 다르게 출력하는 동적 html 파일은 테스트 해줘야 한다!!
 
     def test_home_page_can_save_a_POST_request(self):
-        request = HttpRequest()
-        request.method = 'POST'  # 메소드 형태가 'POST' 형인지 확인
+        request = HttpRequest()  # 홈페이지로 들어와서 사용자의 요청을 받는다.
+        request.method = 'POST'  # 메소드 형태는 'POST'로 날라온다.
         request.POST['item_text'] = '신규 작업 아이템'
         # 지금 사용자가 '신규 작업 아이템'이라고 입력하고 서버에 보낸 거임
 
         response = home_page(request)
         # 지금 home_page가 이제 request를 받아서 처리를 해주어야 한다.
         # 만일 안되있으면 home_page에 구현을 해줘야 한다는 것!!
+
+        self.assertEqual(Item.objects.count(), 1)
+        # 사용자가 POST 요청으로 Item 입력 했는지 확인
+        # 위에서 1개 넣었으니 개수 확인
+
+        new_item = Item.objects.first(
+        # 1개 넣었으므로, 첫번 째 아이템 갖고오고
+
+        self.assertEqual(new_item.text, '신규 작업 아이템')
+        # 옳바르게 text를 넣어 요청을 할 수 있는지 확인
 
         self.assertIn('신규 작업 아이템', response.content.decode())
         # 사용자가 입력했고 반응을 제대로 받는지 확인
