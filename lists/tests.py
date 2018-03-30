@@ -87,6 +87,14 @@ class HomePageTest(TestCase):
 
         self.assertEqual(response.content.decode(), expected_html)
 
+    def test_home_page_only_saves_items_when_necessary(self):
+        request = HttpRequest()
+        home_page(request)
+        # 잘 보자. 지금 request를 줄 때 POST로 주지도 않고,
+        # 입력하지도 않은거다. 즉, 비어 있는 요청은 처리하지 않는 지를 확인!!
+
+        self.assertEqual(Item.objects.count(), 0)
+
 
 class ItemModelTest(TestCase):
     def test_saving_and_retrieving_items(self):
