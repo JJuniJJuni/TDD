@@ -13,11 +13,13 @@
         <!-- name 속성은 form 제어에 필요하다. 예를들어 form 제출에 있어서 POST나 GET을 쓸 때-->
         <!-- id 속성은 CSS, JS 작업을 할 때 필요하다 -->
         <table id="id_list_table">
-            <tr>
-                <td>
-                    {{ new_item_text }}
-                </td>
-            </tr>
+            {% for item in items %}
+                <tr>
+                    <td>
+                        {{ item.text }}
+                    </td>
+                </tr>
+            {% endfor %}
         </table>
     </body>
 </html>

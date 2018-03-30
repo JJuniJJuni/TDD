@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from lists.models import Item
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 
@@ -17,15 +17,37 @@ def home_page(request):
         # 단순히 render(request, 'home.html') 해버리면, 홈페이지 자체를 출력시키는 것!!
         # 입력 처리를 해주어야 함!!
     """
+    ''''
     item = Item()
     item.text = request.POST.get('item_text', '')
     # 사용자로부터 Item input requect를 POST method로 받는다.
     item.save()
     # 전달 받은 Item을 데이터베이스에 저장
+    '''
+    if request.method == 'POST':
+        '''
+        new_item_text = request.POST['item_text']
+        # POST 처리 할 때 html에서 정한 name 값으로 해당 필드 값에
+        # 접근 가능하다는 것은 이제 알지?
+        '''
+        # 위의 처리를 매개 변수에다 바로 때려 박아 버리기
 
-    return render(request, 'home.html', {
-        'new_item_text': item.text
-    })
+        Item.objects.create(text=request.POST['item_text'])
+        # Item()로 인스턴트를 안 만들고, create() method를 쓰면
+        # 데이터베이스에 저장 가능(간소화 가능)
+        return redirect('/')
+        # 원래 페이지로 해당 매개변수(루트 url)로 다시 views 함수 호출
+    '''
+    else:
+        new_item_text = ''
+        # 입력 안했을 시에는 빈 공백만 보여주도록!!
+    '''
+    # redirect를 해주었으므로, 굳이 빈 공백 해줄 필요 없지!!
+
+    # POST 입력 요청 처리를 했을 때만 데이터베이스 저장을 해주도록 처리
+    # POST 한 뒤에는 항상 redirect를 해주어야 한다는 것을 명시!!
+
+    return render(request, 'home.html')
     # [1]
     # refactoring 과정!!
     # HttpResponse 객체를 render을 이용해 반환한다.

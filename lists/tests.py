@@ -25,7 +25,7 @@ class HomePageTest(TestCase):
         # 반환되는 것은 HttpResponse라는 클래스의 인스턴트 이다.
         # 즉, 사용자에게 보내주는 출력 값이라는 이야기!! (template 호출이 안되는 것!!)
 
-        """
+        '''
         self.assertTrue(response.content.startswith(b'<html>'))
         # response의 내용(content)이 '<html>'로 시작하는지 확인
         # responese.content는 byte 형이므로 문자열을 바이트로 변환해서 비교!!
@@ -34,7 +34,7 @@ class HomePageTest(TestCase):
         # endswith은 해당 문자열로 끝나는지 확인하는 것!! (정규식 '문자열$'과 비슷)
         # html 파일 마지막에 Enter 누르고 공백 추가하면 에러 발생한다
         # 그러면 content.strip() 해서 공백 제거해줘야 됨
-        """
+        '''
 
         expected_html = render_to_string("home.html")
         # html 파일을 가져오는 것은 render() 함수와 비슷하다.
@@ -71,21 +71,39 @@ class HomePageTest(TestCase):
         self.assertEqual(new_item.text, '신규 작업 아이템')
         # 옳바르게 text를 넣어 요청을 할 수 있는지 확인
 
-        self.assertIn('신규 작업 아이템', response.content.decode())
-        # 사용자가 입력했고 반응을 제대로 받는지 확인
+    def test_home_page_redirects_after_POST(self):
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = '신규 작업 아이템'
+        # 얘도 POST로 text 값 넣어주어야 한다. 왜냐하면, 진행 과정이
+        # POST 처리를 하고 다시 루트 url로 redirect를 해주는지 확인
+        # 해주는 것이기 때문!!
 
+        response = home_page(request)
+
+        self.assertEqual(response.status_code, 302)
+        # status_code 란 말이 그 자체의 코드를 얘기하는 것 보다는 지금 response가
+        # 어떤 상태인지를 나타내준 것!!
+        # 302는 redirection 완료라는 것이다.
+
+        self.assertEqual(response['location'], '/')
+        # home_page 처리를 거치고, 현재 위치가 루트 주소인지 확인!!
+        # 즉, redirect가 옳바르게 됐냐 이거지!!
+
+        '''
         expected_html = render_to_string(
             'home.html',
             {'new_item_text': '신규 작업 아이템'}
         )
+        # 현재 html 파일에 내가 값을 임의로 주고 나온 결과 값
+        '''
+        # redirect 처리를 해주기 때문에, 요청 확인을 해줄 필요 없음!!
 
         # render_to_string으로 html 파일 문자열로 가져오는데, dictionary 형태로
         # 두번 째 인자 context로 들어감. 키 값에 해당하는 값에다가 넣어줄 수 있음
-        # 위에 보면 헷갈리면 안된다. response는 HttpResponse 객체이므로
-        # 이게 html 파일인지 모른다. 구현하는 입장이므로 아는거지, 이게 맞는지를
-        # 위에서 확인 한 것!!
-
-        self.assertEqual(response.content.decode(), expected_html)
+        # 사용자가 보내온 request(이것도 내가 임의로 줘서 보내온 것)에 따라서
+        # home_page를 거쳐 반환되는 response(html 파일 코드)와 그냥 html 파일
+        # 변수에 값을 넣은 html 코드가 일치하는지 확인!!
 
     def test_home_page_only_saves_items_when_necessary(self):
         request = HttpRequest()
@@ -95,6 +113,17 @@ class HomePageTest(TestCase):
 
         self.assertEqual(Item.objects.count(), 0)
 
+    def test_home_page_displays_all_list_items(self):
+        Item.objects.create(text='itemy 1')
+        Item.objects.create(text='itemy 2')
+
+        request = HttpRequest()
+        # 매개변수로 request를 주어야 하니깐 일단 임의로 호출을 받는 것!!
+        response = home_page(request)
+        # 이제 home_page에서 데이터베이스에서 꺼내와서, 출력이 된채로 반환 됐겠지!!
+
+        self.assertIn('itemy 1', response.content.decode())
+        self.assertIn('itemy 2', response.content.decode())
 
 class ItemModelTest(TestCase):
     def test_saving_and_retrieving_items(self):
