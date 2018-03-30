@@ -96,5 +96,5 @@ class ItemModelTest(TestCase):
 
         first_saved_item = saved_items[0]
         second_saved_item = saved_items[1]
-        self.assertEqual(first_saved_item, '첫 번째 아이템')
-        self.assertEqual(second_saved_item, '두 번째 아이템')
+        self.assertEqual(first_saved_item.text, '첫 번째 아이템')
+        self.assertEqual(second_saved_item.text, '두 번째 아이템')
