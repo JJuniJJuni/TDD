@@ -50,60 +50,6 @@ class HomePageTest(TestCase):
         # 그저 home_page 함수가 옳바른 html 파일을 가리키고 있는지만 확인 한다는 것!!
         # 대신 값이 변할 때마다 다르게 출력하는 동적 html 파일은 테스트 해줘야 한다!!
 
-    def test_home_page_can_save_a_POST_request(self):
-        request = HttpRequest()  # 홈페이지로 들어와서 사용자의 요청을 받는다.
-        request.method = 'POST'  # 메소드 형태는 'POST'로 날라온다.
-        request.POST['item_text'] = '신규 작업 아이템'
-        # 지금 사용자가 '신규 작업 아이템'이라고 입력하고 서버에 보낸 거임
-
-        response = home_page(request)
-        # 지금 home_page가 이제 request를 받아서 처리를 해주어야 한다.
-        # 만일 안되있으면 home_page에 구현을 해줘야 한다는 것!!
-
-        self.assertEqual(Item.objects.count(), 1)
-        # 사용자가 POST 요청으로 Item 입력 했는지 확인
-        # 위에서 1개 넣었으니 개수 확인
-
-        new_item = Item.objects.first()
-        # 1개 넣었으므로, 첫번 째 아이템 갖고오고
-        # Item.objects.all()[0]과 같이 쓸 수 있음
-
-        self.assertEqual(new_item.text, '신규 작업 아이템')
-        # 옳바르게 text를 넣어 요청을 할 수 있는지 확인
-
-    def test_home_page_redirects_after_POST(self):
-        request = HttpRequest()
-        request.method = 'POST'
-        request.POST['item_text'] = '신규 작업 아이템'
-        # 얘도 POST로 text 값 넣어주어야 한다. 왜냐하면, 진행 과정이
-        # POST 처리를 하고 다시 루트 url로 redirect를 해주는지 확인
-        # 해주는 것이기 때문!!
-
-        response = home_page(request)
-
-        self.assertEqual(response.status_code, 302)
-        # status_code 란 말이 그 자체의 코드를 얘기하는 것 보다는 지금 response가
-        # 어떤 상태인지를 나타내준 것!!
-        # 302는 redirection 완료라는 것이다.
-
-        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
-        # home_page 처리를 거치고, 현재 위치가 루트 주소인지 확인!!
-        # 즉, redirect가 옳바르게 됐냐 이거지!!
-
-        '''
-        expected_html = render_to_string(
-            'home.html',
-            {'new_item_text': '신규 작업 아이템'}
-        )
-        # 현재 html 파일에 내가 값을 임의로 주고 나온 결과 값
-        '''
-        # redirect 처리를 해주기 때문에, 요청 확인을 해줄 필요 없음!!
-
-        # render_to_string으로 html 파일 문자열로 가져오는데, dictionary 형태로
-        # 두번 째 인자 context로 들어감. 키 값에 해당하는 값에다가 넣어줄 수 있음
-        # 사용자가 보내온 request(이것도 내가 임의로 줘서 보내온 것)에 따라서
-        # home_page를 거쳐 반환되는 response(html 파일 코드)와 그냥 html 파일
-        # 변수에 값을 넣은 html 코드가 일치하는지 확인!!
 
     def test_home_page_only_saves_items_when_necessary(self):
         request = HttpRequest()
@@ -136,6 +82,7 @@ class ItemModelTest(TestCase):
         self.assertEqual(first_saved_item.text, '첫 번째 아이템')
         self.assertEqual(second_saved_item.text, '두 번째 아이템')
 
+
 class ListViewTest(TestCase):
     def test_uses_list_template(self):
         response = self.client.get('/lists/the-only-list-in-the-world/')
@@ -152,3 +99,84 @@ class ListViewTest(TestCase):
         self.assertContains(response, 'itemy 1')
         self.assertContains(response, 'itemy 2')
         # response.content.decode() 를 사용 안해도 됨!!
+
+
+class NewListTest(TestCase):
+    def test_saving_a_POST_request(self):
+        '''
+        request = HttpRequest()  # 홈페이지로 들어와서 사용자의 요청을 받는다.
+        request.method = 'POST'  # 메소드 형태는 'POST'로 날라온다.
+        request.POST['item_text'] = '신규 작업 아이템'
+        # 지금 사용자가 '신규 작업 아이템'이라고 입력하고 서버에 보낸 거임
+
+        response = home_page(request)
+        # 지금 home_page가 이제 request를 받아서 처리를 해주어야 한다.
+        # 만일 안되있으면 home_page에 구현을 해줘야 한다는 것!!
+        '''
+        # 클라이언트 테스트를 이용해서 refactoring
+
+        self.client.post(
+            '/lists/new',
+            data={'item_text': '신규 작업 아이템'}
+        )
+        # 주의!!  데이터 베이스에 변경을 가하는 '액션' url일 경우
+        # 끝에 슬래시를 달면 안된다!! /new/ (x) -> /new (o)
+        self.assertEqual(Item.objects.count(), 1)
+        # 사용자가 POST 요청으로 Item 입력 했는지 확인
+        # 위에서 1개 넣었으니 개수 확인
+
+        new_item = Item.objects.first()
+        # 1개 넣었으므로, 첫번 째 아이템 갖고오고
+        # Item.objects.all()[0]과 같이 쓸 수 있음
+
+        self.assertEqual(new_item.text, '신규 작업 아이템')
+        # 옳바르게 text를 넣어 요청을 할 수 있는지 확인
+
+    def test_redirects_after_POST(self):
+        '''
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = '신규 작업 아이템'
+        # 얘도 POST로 text 값 넣어주어야 한다. 왜냐하면, 진행 과정이
+        # POST 처리를 하고 다시 루트 url로 redirect를 해주는지 확인
+        # 해주는 것이기 때문!!
+
+        response = home_page(request)
+        '''
+        # 클라이언트 테스트를 이용해서 refactoring
+
+        response = self.client.post(
+            '/lists/new',
+            data={'item_text': '신규 작업 아이템'}
+        )
+
+        '''
+        self.assertEqual(response.status_code, 302)
+        # status_code 란 말이 그 자체의 코드를 얘기하는 것 보다는 지금 response가
+        # 어떤 상태인지를 나타내준 것!!
+        # 302는 redirection 완료라는 것이다.
+
+        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
+        # home_page 처리를 거치고, 현재 위치가 루트 주소인지 확인!!
+        # 즉, redirect가 옳바르게 됐냐 이거지!!
+        '''
+        # Django 테스트 클라이언트가 뷰 함수에서 도메인을 상대 url에 추가하는 Django 스택을
+        # 사용하는 뷰 함수에서 약간 다른 방식으로 동작한다.
+        # 그래서 위의 2단계 리디렉션 방식 대신에 내장 함수를 사용
+
+        self.assertRedirects(response, '/lists/the-only-list-in-the-world/')
+        '''
+        expected_html = render_to_string(
+            'home.html',
+            {'new_item_text': '신규 작업 아이템'}
+        )
+        # 현재 html 파일에 내가 값을 임의로 주고 나온 결과 값
+        '''
+        # redirect 처리를 해주기 때문에, 요청 확인을 해줄 필요 없음!!
+
+        # render_to_string으로 html 파일 문자열로 가져오는데, dictionary 형태로
+        # 두번 째 인자 context로 들어감. 키 값에 해당하는 값에다가 넣어줄 수 있음
+        # 사용자가 보내온 request(이것도 내가 임의로 줘서 보내온 것)에 따라서
+        # home_page를 거쳐 반환되는 response(html 파일 코드)와 그냥 html 파일
+        # 변수에 값을 넣은 html 코드가 일치하는지 확인!!
+

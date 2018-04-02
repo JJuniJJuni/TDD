@@ -24,12 +24,14 @@ def home_page(request):
     item.save()
     # 전달 받은 Item을 데이터베이스에 저장
     '''
+    '''
     if request.method == 'POST':
-        '''
+        
         new_item_text = request.POST['item_text']
         # POST 처리 할 때 html에서 정한 name 값으로 해당 필드 값에
         # 접근 가능하다는 것은 이제 알지?
-        '''
+        # 원래 주석 처리 되있던 블럭
+        
         # 위의 처리를 매개 변수에다 바로 때려 박아 버리기
 
         Item.objects.create(text=request.POST['item_text'])
@@ -37,11 +39,12 @@ def home_page(request):
         # 데이터베이스에 저장 가능(간소화 가능)
         return redirect('/lists/the-only-list-in-the-world/')
         # 원래 페이지로 해당 매개변수(루트 url)로 다시 views 함수 호출
-    '''
+    
     else:
         new_item_text = ''
         # 입력 안했을 시에는 빈 공백만 보여주도록!!
-    '''
+        # 이 블럭은 원래 주석 처리 되있던 거다!!
+    
     # redirect를 해주었으므로, 굳이 빈 공백 해줄 필요 없지!!
 
     # POST 입력 요청 처리를 했을 때만 데이터베이스 저장을 해주도록 처리
@@ -62,6 +65,9 @@ def home_page(request):
 
     # [3]
     # 이미 위에서 POST.get 처리를 해줬으므로, 굳이 render에서 해줄 필요가 없다.
+    '''
+    return render(request, 'home.html')
+    # 이제 다른 html 파일에 기능들을 설정해놨으니 다른건 필요 x
 
 
 def view_list(request):
@@ -69,3 +75,8 @@ def view_list(request):
     return render(request, 'list.html', {
         'items': items
     })
+
+
+def new_list(request):
+    Item.objects.create(text=request.POST["item_text"])
+    return redirect('/lists/the-only-list-in-the-world/')
