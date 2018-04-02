@@ -113,17 +113,6 @@ class HomePageTest(TestCase):
 
         self.assertEqual(Item.objects.count(), 0)
 
-    def test_home_page_displays_all_list_items(self):
-        Item.objects.create(text='itemy 1')
-        Item.objects.create(text='itemy 2')
-
-        request = HttpRequest()
-        # 매개변수로 request를 주어야 하니깐 일단 임의로 호출을 받는 것!!
-        response = home_page(request)
-        # 이제 home_page에서 데이터베이스에서 꺼내와서, 출력이 된채로 반환 됐겠지!!
-
-        self.assertIn('itemy 1', response.content.decode())
-        self.assertIn('itemy 2', response.content.decode())
 
 class ItemModelTest(TestCase):
     def test_saving_and_retrieving_items(self):
@@ -146,3 +135,16 @@ class ItemModelTest(TestCase):
         second_saved_item = saved_items[1]
         self.assertEqual(first_saved_item.text, '첫 번째 아이템')
         self.assertEqual(second_saved_item.text, '두 번째 아이템')
+
+class ListViewTest(TestCase):
+    def test_displays_all_items(self):
+        Item.objects.create(text='itemy 1')
+        Item.objects.create(text='itemy 2')
+
+        response = self.client.get('/lists/the-only-list-in-the-world/')
+        # GET 요청(get(url) 메소드)을 해당 url에서 시뮬레이트 해본다.
+        # 그래서 그 반응을 관찰해 본다.
+
+        self.assertContains(response, 'itemy 1')
+        self.assertContains(response, 'itemy 2')
+        # response.content.decode() 를 사용 안해도 됨!!

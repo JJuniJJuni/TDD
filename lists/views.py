@@ -66,3 +66,9 @@ def home_page(request):
     # [3]
     # 이미 위에서 POST.get 처리를 해줬으므로, 굳이 render에서 해줄 필요가 없다.
 
+
+def view_list(request):
+    items = Item.objects.all()
+    return render(request, 'home.html', {
+        'items': items
+    })
