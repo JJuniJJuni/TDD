@@ -4,7 +4,9 @@
     </head>
     <body>
         <h1>Your To-Do list</h1>
-        <form method="post">
+        <form method="post" action="/">
+        <!-- action 태그는 form 내부에 전송 했을 때, 데이터를 보내는 곳의 url을 지정-->
+        <!-- home_page view 함수에 post 처리가 있으므로, 거기로 데이터를 보내는 것!!-->
             <input name="item_text" id="id_new_item" placeholder="작업 아이템 출력">
             {% csrf_token %}
         </form>
@@ -12,5 +14,10 @@
         <!-- csrf_token은 각 폼이 생성하는 POST 요청을 확인 할수 있는 토큰 생성 -->
         <!-- name 속성은 form 제어에 필요하다. 예를들어 form 제출에 있어서 POST나 GET을 쓸 때-->
         <!-- id 속성은 CSS, JS 작업을 할 때 필요하다 -->
+        <table id="id_list_table">
+            {% for item in items %}
+                <tr><td>{{ forloop.counter }}.{{ item.text }}</td></tr>
+            {% endfor %}
+        </table>
     </body>
 </html>
