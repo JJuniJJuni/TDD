@@ -70,8 +70,9 @@ def home_page(request):
     # 이제 다른 html 파일에 기능들을 설정해놨으니 다른건 필요 x
 
 
-def view_list(request):
-    items = Item.objects.all()
+def view_list(request, list_id):
+    list_ = List.objects.get(id=list_id)
+    items = Item.objects.filter(list=list_)
     return render(request, 'list.html', {
         'items': items
     })
@@ -80,4 +81,4 @@ def view_list(request):
 def new_list(request):
     list_ = List.objects.create()
     Item.objects.create(text=request.POST["item_text"], list=list_)
-    return redirect('/lists/the-only-list-in-the-world/')
+    return redirect('/lists/%d/' % (list_.id,))

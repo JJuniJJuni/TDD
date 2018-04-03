@@ -95,20 +95,27 @@ class ListAndItemModelTest(TestCase):
 
 class ListViewTest(TestCase):
     def test_uses_list_template(self):
-        response = self.client.get('/lists/the-only-list-in-the-world/')
+        list_ = List.objects.create()
+        response = self.client.get('/lists/%d/' %(list_.id,))
         self.assertTemplateUsed(response, 'list.html')
 
-    def test_displays_all_items(self):
-        list_ = List.objects.create()
-        Item.objects.create(text='itemy 1', list=list_)
-        Item.objects.create(text='itemy 2', list=list_)
+    def test_displays_only_items_for_that_list(self):
+        correct_list = List.objects.create()
 
-        response = self.client.get('/lists/the-only-list-in-the-world/')
+        Item.objects.create(text='itemey 1', list=correct_list)
+        Item.objects.create(text='itemey 2', list=correct_list)
+        other_list = List.objects.create()
+        Item.objects.create(text='other itemey 1', list=other_list)
+        Item.objects.create(text='other itemey 2', list=other_list)
+
+        response = self.client.get('/lists/%d/' %(correct_list.id,))
         # GET 요청(get(url) 메소드)을 해당 url에서 시뮬레이트 해본다.
         # 그래서 그 반응을 관찰해 본다.
 
-        self.assertContains(response, 'itemy 1')
-        self.assertContains(response, 'itemy 2')
+        self.assertContains(response, 'itemey 1')
+        self.assertContains(response, 'itemey 2')
+        self.assertNotContains(response, 'other itemey 1')
+        self.assertNotContains(response, 'other itemey 2')
         # response.content.decode() 를 사용 안해도 됨!!
 
 
@@ -175,7 +182,12 @@ class NewListTest(TestCase):
         # 사용하는 뷰 함수에서 약간 다른 방식으로 동작한다.
         # 그래서 위의 2단계 리디렉션 방식 대신에 내장 함수를 사용
 
-        self.assertRedirects(response, '/lists/the-only-list-in-the-world/')
+        new_list = List.objects.first()
+        # Django TestCase는 기존 데이터 베이스를 초기화 하고 test!!
+
+        self.assertRedirects(response, '/lists/%d/' % (new_list.id,))
+        # 지금 new_list 함수로 url이 전달되면 list가 만들어지고, 해당 list_id로 view_list 로 전달
+        # 지금 임의로 서버에서 하나 만들어서 전달되는 response에서 list.id 랑 같은지 비교
         '''
         expected_html = render_to_string(
             'home.html',
@@ -191,3 +203,28 @@ class NewListTest(TestCase):
         # home_page를 거쳐 반환되는 response(html 파일 코드)와 그냥 html 파일
         # 변수에 값을 넣은 html 코드가 일치하는지 확인!!
 
+
+class NewItemTest(TestCase):
+    def test_can_save_a_POST_request_to_an_existing_list(self):
+        other_list = List.objects.create()
+        correct_list = List.objects.create()
+
+        self.client.post(
+            '/lists/%d/add_item' % (correct_list.id,),
+            data={'item_text': '기존 목록에 신규 아이템'}
+            # post 요청으로 보내는 데이터를 사전식으로 보냄(key 값은 name)
+        )
+
+        self.assertEqual(Item.objects.count(), 1)
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, '기존 목록에 신규 아이템')
+        self.assertEqual(new_item.list, correct_list)
+
+    def test_redirects_to_list_view(self):
+        other_list = List.objects.create()
+        correct_list = List.objects.create()
+
+        response = self.client.post(
+            '/lists/%d/add_item' %(correct_list,),
+            data = {'item_text': '기존 목록에 신규 아이템'}
+        )
